@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/eslint-plugin-auto-let.svg)](https://www.npmjs.com/package/eslint-plugin-auto-let)
 
-ESLint plugin that converts `const` to `let` when reassignment is proven via AST scope analysis — no heuristics, no intent guessing.
+ESLint plugin that converts `const` to `let` when constant assignment happens in the same function scope.
 
 Pairs well with [`prefer-const`](https://eslint.org/docs/latest/rules/prefer-const) and IDE lint-on-save:
 `prefer-const` will rewrite a `let` to `const` before you've finished writing reassignment logic if you lint with autofix on save
