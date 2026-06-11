@@ -1,0 +1,62 @@
+{
+  "name": "eslint-plugin-auto-let",
+  "version": "0.1.0",
+  "description": "Automatically convert const to let when mutation is proven via AST scope analysis",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "eslintplugin",
+    "const",
+    "let",
+    "typescript",
+    "auto-fix",
+    "prefer-const"
+  ],
+  "author": "Totolicious",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/totolicious/eslint-plugin-auto-let.git"
+  },
+  "bugs": {
+    "url": "https://github.com/totolicious/eslint-plugin-auto-let/issues"
+  },
+  "homepage": "https://github.com/totolicious/eslint-plugin-auto-let#readme",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "peerDependencies": {
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": ">=8.57.0"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^8.18.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^8.18.0",
+    "@typescript-eslint/rule-tester": "^8.18.0",
+    "@typescript-eslint/utils": "^8.18.0",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
