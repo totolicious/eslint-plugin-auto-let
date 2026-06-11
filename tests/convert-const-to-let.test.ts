@@ -105,22 +105,26 @@ ruleTester.run("convert-const-to-let", rule, {
     },
     {
       code: `
-        const newPwd: string;
-        if (!args[0]) {
-          newPwd = process.env.HOME;
-        } else {
-          newPwd = args[0];
+        function formatLabel(input?: string) {
+          const label: string;
+          if (input) {
+            label = input;
+          } else {
+            label = "default";
+          }
+          label = label.toUpperCase();
         }
-        newPwd = resolve(newPwd);
       `,
       output: `
-        let newPwd: string;
-        if (!args[0]) {
-          newPwd = process.env.HOME;
-        } else {
-          newPwd = args[0];
+        function formatLabel(input?: string) {
+          let label: string;
+          if (input) {
+            label = input;
+          } else {
+            label = "default";
+          }
+          label = label.toUpperCase();
         }
-        newPwd = resolve(newPwd);
       `,
       errors: [{ messageId: "convert" }],
     },
