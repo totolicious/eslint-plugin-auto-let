@@ -10,7 +10,7 @@ Pairs well with [`prefer-const`](https://eslint.org/docs/latest/rules/prefer-con
 ## Motivation & Warning
 
 - You still want to use `prefer-const` where it matters
-- You are inconvenienced by `let` being converted to `const` while writing
+- You are inconvenienced by `let` being converted to `const` when saving your file immediately after the let declaration
 - You are aware of the scenarios where this can go wrong (accidentally writing to a const in the same function)
 
 ## Behavior
@@ -24,23 +24,39 @@ The single rule `auto-let/convert-const-to-let` converts simple `const` declarat
 
 ### Example
 
-Before:
+Before saving:
 
 ```ts
 function someFuction() {
-  const count: number = 0; // prefer-const auto-fixed let to const on save
-
-  // assignment happening after save
-  count++;
-  console.log(count);
+  let count: number = 0; // this will be converted to const by prefer-const
 }
 ```
 
-After:
+After saving:
 
 ```ts
 function someFuction() {
-  let count: number = 0;
+  const count: number = 0; // converted to const
+}
+```
+
+Adding your assignment
+
+```ts
+function someFuction() {
+  const count: number = 0;
+
+  count++;
+  console.log(count);
+  // did not save yet, but after you save, the const count declaration will be converted to let
+}
+```
+
+After saving
+
+```ts
+function someFuction() {
+  let count: number = 0; // correctly converted const to let
 
   count++;
   console.log(count);
@@ -59,7 +75,7 @@ npm install -D eslint-plugin-auto-let @typescript-eslint/parser
 - ESLint >= 8.57
 - `@typescript-eslint/parser` ^8 (TypeScript only)
 
-## Usage
+## Eslint config
 
 ```js
 // eslint.config.js
@@ -86,7 +102,7 @@ export default [
 
 Enable fix-on-save in your editor (`source.fixAll.eslint`) so the rule runs alongside `prefer-const` while you write.
 
-### Converts (`const` → `let`)
+### Some examples (`const` → `let`)
 
 Simple reassignment:
 
@@ -182,7 +198,7 @@ items.push("a");
 
 ```ts
 const MAX_RETRIES = 3;
-MAX_RETRIES = 5; // rule ignores this binding
+MAX_RETRIES = 5; // rule ignores this binding, prefer-const will keep this as a constant
 ```
 
 Import bindings:
@@ -198,7 +214,7 @@ Reassignment from a nested function — different scope, not auto-fixed:
 function outer() {
   const value = 1;
   function inner() {
-    value = 2; // rule ignores this
+    value = 2; // this is ignored
   }
 }
 ```
