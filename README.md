@@ -2,10 +2,10 @@
 
 [![npm version](https://img.shields.io/npm/v/eslint-plugin-auto-let.svg)](https://www.npmjs.com/package/eslint-plugin-auto-let)
 
-ESLint plugin that converts `const` to `let` when constant assignment happens in the same function scope.
+ESLint plugin that rewrites `const` to `let` when a const is reassigned within the same function or module.
 
 Pairs well with [`prefer-const`](https://eslint.org/docs/latest/rules/prefer-const) and IDE lint-on-save:
-`prefer-const` will rewrite a `let` to `const` before you've finished writing reassignment logic if you lint with autofix on save
+`prefer-const` may rewrite `let` to `const` before you've finished writing reassignment logic; this rule undoes that when a write is present.
 
 ## Motivation & Warning
 
@@ -18,10 +18,9 @@ Pairs well with [`prefer-const`](https://eslint.org/docs/latest/rules/prefer-con
 The single rule `auto-let/convert-const-to-let` converts simple `const` declarations to `let` only when:
 
 - The declaration is a single identifier (`const x = 1`, not destructuring or multi-declaration)
-- The binding is local (not an import)
 - At least one write reference exists (`x = ...`, `x += 1`, `x++`, etc.)
 - Ignores `UPPERCASE_SNAKE_CASE` constants
-- Ignores assignments that happen inside other functions (including nested functions)
+- Only happens in the same function (ignores assignments that happen inside other functions (including nested functions))
 
 ### Example
 
@@ -85,9 +84,135 @@ export default [
 ];
 ```
 
+Enable fix-on-save in your editor (`source.fixAll.eslint`) so the rule runs alongside `prefer-const` while you write.
+
+### Converts (`const` → `let`)
+
+Simple reassignment:
+
+```ts
+// before
+const count = 0;
+count++;
+
+// after (eslint --fix)
+let count = 0;
+count++;
+```
+
+Assignment operators:
+
+```ts
+// before
+const total = 10;
+total += 5;
+
+// after
+let total = 10;
+total += 5;
+```
+
+Assign in branches, then use later (common with `prefer-const` on save):
+
+```ts
+// before
+function formatLabel(input?: string) {
+  const label: string;
+  if (input) {
+    label = input;
+  } else {
+    label = "default";
+  }
+  label = label.toUpperCase();
+}
+
+// after
+function formatLabel(input?: string) {
+  let label: string;
+  if (input) {
+    label = input;
+  } else {
+    label = "default";
+  }
+  label = label.toUpperCase();
+}
+```
+
+Reassignment inside a loop:
+
+```ts
+// before
+const cursor = 0;
+while (cursor < items.length) {
+  cursor = next(cursor);
+}
+
+// after
+let cursor = 0;
+while (cursor < items.length) {
+  cursor = next(cursor);
+}
+```
+
+### Unchanged (left as-is)
+
+No reassignment — binding never changes:
+
+```ts
+const name = "alice";
+console.log(name);
+```
+
+Destructuring or multiple declarations — not simple `const x = …`:
+
+```ts
+const { x, y } = point;
+const a = 1,
+  b = 2;
+```
+
+Property mutation — the binding is unchanged, only the object contents:
+
+```ts
+const items: string[] = [];
+items.push("a");
+```
+
+`UPPERCASE_SNAKE_CASE` — treated as a true constant:
+
+```ts
+const MAX_RETRIES = 3;
+MAX_RETRIES = 5; // rule ignores this binding
+```
+
+Import bindings:
+
+```ts
+import fs from "node:fs";
+fs = null; // rule ignores imports
+```
+
+Reassignment from a nested function — different scope, not auto-fixed:
+
+```ts
+function outer() {
+  const value = 1;
+  function inner() {
+    value = 2; // rule ignores this
+  }
+}
+```
+
+Already `let`:
+
+```ts
+let count = 0;
+count++;
+```
+
 ## Alternatives
 
-- Always use `let`: (eslint-plugin-prefer-let)[https://www.npmjs.com/package/eslint-plugin-prefer-let]
+- Always use `let`: [eslint-plugin-prefer-let](https://www.npmjs.com/package/eslint-plugin-prefer-let)
 
 ## License
 
