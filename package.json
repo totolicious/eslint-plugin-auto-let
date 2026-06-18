@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-auto-let",
   "version": "0.1.0",
-  "description": "Automatically convert const to let when mutation is proven via AST scope analysis",
+  "description": "Automatically convert const to let when necessary",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
